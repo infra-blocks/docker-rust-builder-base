@@ -1,0 +1,41 @@
+name: Build Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: The tags that will be applied to the image.
+        required: true
+        default: '["latest"]'
+      # List the required build arguments here.
+      base:
+        description: An example build argument which specifies the base image tag to use.
+        required: true
+
+jobs:
+  build-image:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+      - name: Build, tag and publish docker image
+        id: docker-publish
+        uses: infrastructure-blocks/docker-publish-action@v1
+        with:
+          service: base
+          tags: ${{ fromJson(inputs.tags) }}
+          build-arguments: '{"BASE": "${{ inputs.base }}"}'
+      - name: Show published images
+        run: |
+          echo "${{ steps.docker-publish.outputs.published }}"

@@ -1,0 +1,7 @@
+services:
+  base:
+    image: public.ecr.aws/infrastructure-blocks/docker-base-image-template:latest
+    build:
+      context: ../
+      dockerfile: docker/base/Dockerfile
+    container_name: docker-base-image-template
