@@ -1,7 +1,7 @@
 services:
   base:
-    image: public.ecr.aws/infrastructure-blocks/docker-base-image-template:latest
+    image: public.ecr.aws/infrastructure-blocks/docker-rust-builder-base:latest
     build:
       context: ../
       dockerfile: docker/base/Dockerfile
-    container_name: docker-base-image-template
+    container_name: docker-rust-builder-base
