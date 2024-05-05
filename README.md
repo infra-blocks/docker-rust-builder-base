@@ -1,17 +1,24 @@
-# docker-base-image-template
-[![Build Image](https://github.com/infrastructure-blocks/docker-base-image-template/actions/workflows/build-image.yml/badge.svg)](https://github.com/infrastructure-blocks/docker-base-image-template/actions/workflows/build-image.yml)
-[![Trigger Update From Template](https://github.com/infrastructure-blocks/docker-base-image-template/actions/workflows/trigger-update-from-template.yml/badge.svg)](https://github.com/infrastructure-blocks/docker-base-image-template/actions/workflows/trigger-update-from-template.yml)
+# docker-rust-builder-base
+[![Build Image](https://github.com/infrastructure-blocks/docker-rust-builder-base/actions/workflows/build-image.yml/badge.svg)](https://github.com/infrastructure-blocks/docker-rust-builder-base/actions/workflows/build-image.yml)
+[![Update From Template](https://github.com/infrastructure-blocks/docker-rust-builder-base/actions/workflows/update-from-template.yml/badge.svg)](https://github.com/infrastructure-blocks/docker-rust-builder-base/actions/workflows/update-from-template.yml)
 
-This template repository is for repos that hold Docker base images. Those images are made to be built programmatically
-and on-demand. This is unlike application images, which should be rebuilt on every pull request.
+This repository holds the definition for builder images of Rust projects. Docker Rust based images are meant to be
+built using a multi-stage build. The first stage is the build stage, and the build stage can inherit from this
+image.
 
-## Instantiating the template
+This image is based off of `alpine` images, so the matching runtime image should also be based off of `alpine`.
 
-Upon instantiating the template repository, developers should do the following:
-- Remove the [trigger update from template workflow](.github/workflows/trigger-update-from-template.yml)
-- Update the README.md header and project description, in addition to this section.
-- Redirect the badges to the correct repository.
-- Remove/update the code owners file.
-- Rename the service and the docker image in the [docker compose](./docker/docker-compose.yml) file.
-- Update the [build-image](./.github/workflows/build-image.yml) workflow inputs to reflect the new image's
-build requirements (for example, configure the build arguments).
+## Usage
+
+Here is an example Dockerfile where a Rust project is built using this base image:
+
+```Dockerfile
+# The base tag is the version of the Rust toolchain to use.
+FROM public.ecr.aws/infrastructure-blocks/docker-typescript-action-base:1.75 as builder
+
+# This base builder image uses alpine, so the runtime image should also use alpine.
+FROM alpine
+RUN apk update && apk add --no-cache <extra-runtime-dependencies>
+COPY --from=builder /builder/<your-rust-project> /usr/local/bin/<your-rust-project>
+CMD ["<your-rust-project>"]
+```
