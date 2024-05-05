@@ -19,6 +19,6 @@ FROM public.ecr.aws/infrastructure-blocks/docker-typescript-action-base:1.75 as 
 # This base builder image uses alpine, so the runtime image should also use alpine.
 FROM alpine
 RUN apk update && apk add --no-cache <extra-runtime-dependencies>
-COPY --from=builder /builder/<your-rust-project> /usr/local/bin/<your-rust-project>
+COPY --from=builder /usr/local/cargo/bin/<your-rust-project> /usr/local/bin/<your-rust-project>
 CMD ["<your-rust-project>"]
 ```
